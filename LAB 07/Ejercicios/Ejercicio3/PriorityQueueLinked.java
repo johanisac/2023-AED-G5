@@ -1,16 +1,19 @@
 package Ejercicio3;
+
 import Actividad1.ExceptionIsEmpty;
 import Actividad2.QueueLink;
 import Actividad3.PriorityQueue;
 
 public class PriorityQueueLinked<E, P extends Comparable<P>> implements PriorityQueue<E, P> {
-    private int numPriorities;
-    private QueueLink<E>[] queues;
 
-    public PriorityQueueLinked(int numPriorities) {
-        this.numPriorities = numPriorities;
-        queues = (QueueLink<E>[]) new QueueLink[numPriorities];
-        for (int i = 0; i < numPriorities; i++) {
+    private QueueLink<E>[] queues;
+    private int numOfPriorities;
+
+    @SuppressWarnings("unchecked")
+    public PriorityQueueLinked(int numOfPriorities) {
+        this.numOfPriorities = numOfPriorities;
+        queues = new QueueLink[numOfPriorities];
+        for (int i = 0; i < numOfPriorities; i++) {
             queues[i] = new QueueLink<>();
         }
     }
@@ -21,34 +24,34 @@ public class PriorityQueueLinked<E, P extends Comparable<P>> implements Priority
     }
 
     public E dequeue() throws ExceptionIsEmpty {
-        for (int i = numPriorities - 1; i >= 0; i--) {
+        for (int i = 0; i < numOfPriorities; i++) {
             if (!queues[i].isEmpty()) {
                 return queues[i].dequeue();
             }
         }
-        throw new ExceptionIsEmpty("La cola está vacía");
+        throw new ExceptionIsEmpty("La cola de prioridad está vacía");
     }
 
     public E front() throws ExceptionIsEmpty {
-        for (int i = numPriorities - 1; i >= 0; i--) {
+        for (int i = 0; i < numOfPriorities; i++) {
             if (!queues[i].isEmpty()) {
                 return queues[i].front();
             }
         }
-        throw new ExceptionIsEmpty("La cola está vacía");
+        throw new ExceptionIsEmpty("La cola de prioridad está vacía");
     }
 
     public E back() throws ExceptionIsEmpty {
-        for (int i = 0; i < numPriorities; i++) {
+        for (int i = numOfPriorities - 1; i >= 0; i--) {
             if (!queues[i].isEmpty()) {
                 return queues[i].back();
             }
         }
-        throw new ExceptionIsEmpty("La cola está vacía");
+        throw new ExceptionIsEmpty("La cola de prioridad está vacía");
     }
 
     public boolean isEmpty() {
-        for (int i = 0; i < numPriorities; i++) {
+        for (int i = 0; i < numOfPriorities; i++) {
             if (!queues[i].isEmpty()) {
                 return false;
             }
@@ -57,19 +60,29 @@ public class PriorityQueueLinked<E, P extends Comparable<P>> implements Priority
     }
 
     private int getPriorityIndex(P priority) {
-        int index = numPriorities - 1;
-        for (int i = 0; i < numPriorities - 1; i++) {
-            if (priority.compareTo(getPriorityAtIndex(i)) > 0) {
-                index = i;
-                break;
+        for (int i = 0; i < numOfPriorities; i++) {
+            if (priority.compareTo(getPriority(i)) <= 0) {
+                return i;
             }
         }
-        return index;
+        return numOfPriorities - 1;
     }
 
-    private P getPriorityAtIndex(int index) {
-        // This method should be overridden by subclasses to provide a mapping
-        // from index to priority value. The default implementation returns null.
-        return null;
+    private P getPriority(int index) {
+        int step = 1 + (numOfPriorities - 1) / 10;
+        return (P) new Integer(index * step);
+    }
+
+    public String toString() {
+
+        String sb = "";
+        for (int i = 1; i < numOfPriorities; i++) {
+            sb += "Prioridad " + getPriority(i) + " : ";
+            sb += queues[i].toString();
+            if (i < numOfPriorities - 1) {
+                sb += "\n";
+            }
+        }
+        return sb;
     }
 }
