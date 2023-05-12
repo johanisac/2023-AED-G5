@@ -9,7 +9,6 @@ public class PriorityQueueLinked<E, P extends Comparable<P>> implements Priority
     private QueueLink<E>[] queues;
     private int numOfPriorities;
 
-    @SuppressWarnings("unchecked")
     public PriorityQueueLinked(int numOfPriorities) {
         this.numOfPriorities = numOfPriorities;
         queues = new QueueLink[numOfPriorities];
@@ -20,7 +19,7 @@ public class PriorityQueueLinked<E, P extends Comparable<P>> implements Priority
 
     public void enqueue(E element, P priority) {
         int index = getPriorityIndex(priority);
-        queues[index].enqueue(element);
+        queues[index - 1].enqueue(element);
     }
 
     public E dequeue() throws ExceptionIsEmpty {
@@ -60,24 +59,36 @@ public class PriorityQueueLinked<E, P extends Comparable<P>> implements Priority
     }
 
     private int getPriorityIndex(P priority) {
-        for (int i = 0; i < numOfPriorities; i++) {
-            if (priority.compareTo(getPriority(i)) <= 0) {
-                return i;
-            }
+        if (priority.compareTo((P) new Integer(numOfPriorities)) < 0 && (int) priority > 0) {
+            return (int) priority;
+        } else {
+            return numOfPriorities;
         }
-        return numOfPriorities - 1;
     }
 
-    private P getPriority(int index) {
-        int step = 1 + (numOfPriorities - 1) / 10;
-        return (P) new Integer(index * step);
+    public boolean Searchel(E element) {
+        for (int i = 0; i < numOfPriorities; i++) {
+            if (queues[i].Searchelemto(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int Searchpriority(E element) {
+        for (int i = 0; i < numOfPriorities; i++) {
+            if (queues[i].Searchelemto(element)) {
+                return i+1;
+            }
+        }
+        return 1;
     }
 
     public String toString() {
 
         String sb = "";
-        for (int i = 1; i < numOfPriorities; i++) {
-            sb += "Prioridad " + getPriority(i) + " : ";
+        for (int i = 0; i < numOfPriorities; i++) {
+            sb += "Prioridad " + (i + 1) + " : ";
             sb += queues[i].toString();
             if (i < numOfPriorities - 1) {
                 sb += "\n";

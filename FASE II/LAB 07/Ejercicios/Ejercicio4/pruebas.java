@@ -7,8 +7,7 @@ import Ejercicio3.PriorityQueueLinked;
 import Actividad1.*;
 import Ejercicio1.StackLink;
 
-class Polaca {
-
+public class pruebas {
     public void readFile(String ruta) {
         try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
             String linea;
@@ -20,7 +19,7 @@ class Polaca {
                 }
                 String infija = linea.substring(1, linea.length() - 1);
                 String postfija = inToPos(infija);
-                // System.out.println(postfija);
+                //System.out.println(postfija);
                 int resultado = resultExpresion(postfija);
                 System.out.println(infija + " = " + resultado);
             }
@@ -38,68 +37,84 @@ class Polaca {
         operaciones.enqueue('S', 3);
         StringBuilder postfija = new StringBuilder();
         StackArray<Character> pilaoperaciones = new StackArray<>(100);
+        StringBuilder numero = new StringBuilder(); // Para construir números de más de un dígito
         try {
             for (char caracter : infija.toCharArray()) {
                 if (Character.isDigit(caracter)) {
-                    postfija.append(caracter);
-
-                } else if (operaciones.Searchel(caracter)) {
-                    while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '('
-                            && operaciones.Searchpriority(pilaoperaciones.top()) >= operaciones
-                                    .Searchpriority(caracter)) {
-                        postfija.append(pilaoperaciones.pop());
+                    numero.append(caracter); // Agregar dígitos al número
+                } else {
+                    if (numero.length() > 0) {
+                        // Si hay un número pendiente, agregarlo a la cadena de salida
+                        postfija.append(numero.toString());
+                        postfija.append(" ");
+                        numero.setLength(0); // Limpiar el StringBuilder del número
                     }
-                    pilaoperaciones.push(caracter);
-                } else if (caracter == '(') {
-                    pilaoperaciones.push(caracter);
-                } else if (caracter == ')') {
-                    while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '(') {
-                        postfija.append(pilaoperaciones.pop());
+                    if (operaciones.Searchel(caracter)) {
+                        while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '('
+                                && operaciones.Searchpriority(pilaoperaciones.top()) >= operaciones
+                                        .Searchpriority(caracter)) {
+                            postfija.append(pilaoperaciones.pop());
+                            postfija.append(" ");
+                        }
+                        pilaoperaciones.push(caracter);
+                    } else if (caracter == '(') {
+                        pilaoperaciones.push(caracter);
+                    } else if (caracter == ')') {
+                        while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '(') {
+                            postfija.append(pilaoperaciones.pop());
+                            postfija.append(" ");
+                        }
+                        pilaoperaciones.pop();
                     }
-                    pilaoperaciones.pop();
                 }
+            }
+            if (numero.length() > 0) {
+                // Si hay un número pendiente, agregarlo a la cadena de salida
+                postfija.append(numero.toString());
+                postfija.append(" ");
             }
             while (!pilaoperaciones.isEmpty()) {
                 postfija.append(pilaoperaciones.pop());
+                postfija.append(" ");
             }
         } catch (ExceptionIsEmpty e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        return postfija.toString();
+        return postfija.toString().trim(); // Eliminar espacios sobrantes al inicio y final
     }
 
     public int resultExpresion(String postfija) {
         StackLink<Integer> pilaresultado = new StackLink<Integer>();
         int resultado = 0;
-        for (char caracter : postfija.toCharArray()) {
-            if (Character.isDigit(caracter)) {
-                pilaresultado.push(Character.getNumericValue(caracter));
-            } else {
+        String[] tokens = postfija.split(" ");
+        for (String token : tokens) {
+            if (token.matches("\\d+")) { // si el token es un número
+                pilaresultado.push(Integer.parseInt(token));
+            } else { // si el token es un operador
                 int op2 = 0;
                 int op1 = 0;
                 try {
                     op2 = pilaresultado.pop();
                     op1 = pilaresultado.pop();
                 } catch (ExceptionIsEmpty e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                switch (caracter) {
-                    case '+':
+                switch (token) {
+                    case "+":
                         pilaresultado.push(op1 + op2);
                         break;
-                    case '-':
+                    case "-":
                         pilaresultado.push(op1 - op2);
                         break;
-                    case '*':
+                    case "*":
                         pilaresultado.push(op1 * op2);
                         break;
-                    case '/':
+                    case "/":
                         pilaresultado.push(op1 / op2);
                         break;
-                    case 'S':
+                    case "S":
                         pilaresultado.push((int) Math.pow(op1, op2));
                         break;
                 }
@@ -108,10 +123,9 @@ class Polaca {
         try {
             resultado = pilaresultado.top();
         } catch (ExceptionIsEmpty e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return resultado;
-
     }
+
 }

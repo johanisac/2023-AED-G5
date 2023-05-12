@@ -7,7 +7,7 @@ public class Test {
 
         // Test with Integer elements
         System.out.println("\n\tPila de enteros\n");
-        PriorityQueueLinked<Integer, Integer> Enterospryority = new PriorityQueueLinked<>(4);
+        PriorityQueueLinked<Integer, Integer> Enterospryority = new PriorityQueueLinked<>(3);
         Enterospryority.enqueue(10, 1);
         Enterospryority.enqueue(202, 2);
         Enterospryority.enqueue(30, 3);
@@ -39,9 +39,9 @@ public class Test {
         }
 
         System.out.println("\n\n\tPila de Cadena\n");
-        PriorityQueueLinked<String, Integer> cadenapryority = new PriorityQueueLinked<>(6);
-        cadenapryority.enqueue("Jose", 3);
-        cadenapryority.enqueue("Johan", 1);
+        PriorityQueueLinked<String, Integer> cadenapryority = new PriorityQueueLinked<>(10);
+        cadenapryority.enqueue("Jose", 15);
+        cadenapryority.enqueue("Johan", -1);
         cadenapryority.enqueue("Erick", 5);
         cadenapryority.enqueue("Grabiel", 4);
         cadenapryority.enqueue("Favio", 1);
