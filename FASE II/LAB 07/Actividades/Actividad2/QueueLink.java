@@ -53,8 +53,18 @@ public class QueueLink<E> implements Queue<E> {
 
     // public boolean isFull() {
 
-    //     return false; No sirve porque trabaajmos con lista enlazada
+    // return false; No sirve porque trabaajmos con lista enlazada
     // }
+    public boolean Searchelemto(E element) {
+        Node<E> currentNode = first;
+        while (currentNode != null) {
+            if (currentNode.getElement().equals(element)) {
+                return true;
+            }
+            currentNode = currentNode.getNext();
+        }
+        return false;
+    }
 
     public void destroyQueue() {
         this.first = null;

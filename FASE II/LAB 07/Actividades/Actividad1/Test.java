@@ -4,7 +4,7 @@ public class Test {
     public static void main(String[] args) throws ExceptionIsEmpty {
         // crear una pila de enteros
         System.out.println("\n\tPila de enteros\n");
-        Stack<Integer> pilaEnteros = new StackArray<>(5);
+        StackArray<Integer> pilaEnteros = new StackArray<>(5);
         // agregar elementos a la pila de enteros
         pilaEnteros.push(10);
         pilaEnteros.push(20);
