@@ -8,7 +8,6 @@ import Actividad1.*;
 import Ejercicio1.StackLink;
 
 class Polaca {
-
     public void readFile(String ruta) {
         try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
             String linea;
@@ -20,7 +19,7 @@ class Polaca {
                 }
                 String infija = linea.substring(1, linea.length() - 1);
                 String postfija = inToPos(infija);
-                // System.out.println(postfija);
+                //System.out.println("posfijo " + postfija);
                 int resultado = resultExpresion(postfija);
                 System.out.println(infija + " = " + resultado);
             }
@@ -38,80 +37,100 @@ class Polaca {
         operaciones.enqueue('S', 3);
         StringBuilder postfija = new StringBuilder();
         StackArray<Character> pilaoperaciones = new StackArray<>(100);
+        int i = 0;
         try {
-            for (char caracter : infija.toCharArray()) {
+            while (i < infija.length()) {
+                char caracter = infija.charAt(i);
                 if (Character.isDigit(caracter)) {
-                    postfija.append(caracter);
-
+                    int j = i;
+                    while (j < infija.length() && Character.isDigit(infija.charAt(j))) {
+                        j++;
+                    }
+                    postfija.append(infija.substring(i, j));
+                    postfija.append(" ");
+                    i = j - 1;
                 } else if (operaciones.Searchel(caracter)) {
                     while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '('
                             && operaciones.Searchpriority(pilaoperaciones.top()) >= operaciones
                                     .Searchpriority(caracter)) {
                         postfija.append(pilaoperaciones.pop());
+                        postfija.append(" ");
                     }
                     pilaoperaciones.push(caracter);
                 } else if (caracter == '(') {
+                    if (i > 0 && (Character.isDigit(infija.charAt(i - 1)) || infija.charAt(i - 1) == ')')) {
+                        // Multiplicar
+                        pilaoperaciones.push('*');
+                    }
                     pilaoperaciones.push(caracter);
                 } else if (caracter == ')') {
                     while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '(') {
                         postfija.append(pilaoperaciones.pop());
+                        postfija.append(" ");
                     }
                     pilaoperaciones.pop();
+                    if (i < infija.length() - 1
+                            && (Character.isDigit(infija.charAt(i + 1)) || infija.charAt(i + 1) == '(')) {
+                        // Multiplicar
+                        postfija.append('*');
+                        postfija.append(" ");
+                    }
                 }
+                i++;
             }
             while (!pilaoperaciones.isEmpty()) {
                 postfija.append(pilaoperaciones.pop());
+                postfija.append(" ");
             }
         } catch (ExceptionIsEmpty e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         return postfija.toString();
     }
 
     public int resultExpresion(String postfija) {
-        StackLink<Integer> pilaresultado = new StackLink<Integer>();
+        StackLink<Float> pilaresultado = new StackLink<Float>();
         int resultado = 0;
-        for (char caracter : postfija.toCharArray()) {
-            if (Character.isDigit(caracter)) {
-                pilaresultado.push(Character.getNumericValue(caracter));
-            } else {
-                int op2 = 0;
-                int op1 = 0;
+        String[] tokens = postfija.split(" ");
+        for (String token : tokens) {
+            if (token.matches("\\d+")) { // si el token es un número
+                pilaresultado.push(Float.parseFloat(token));
+            } else { // si el token es un operador
+                Float op2 = 0f;
+                Float op1 = 0f;
                 try {
                     op2 = pilaresultado.pop();
                     op1 = pilaresultado.pop();
                 } catch (ExceptionIsEmpty e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                switch (caracter) {
-                    case '+':
+                switch (token) {
+                    case "+":
                         pilaresultado.push(op1 + op2);
                         break;
-                    case '-':
+                    case "-":
                         pilaresultado.push(op1 - op2);
                         break;
-                    case '*':
+                    case "*":
                         pilaresultado.push(op1 * op2);
                         break;
-                    case '/':
+                    case "/":
                         pilaresultado.push(op1 / op2);
                         break;
-                    case 'S':
-                        pilaresultado.push((int) Math.pow(op1, op2));
+                    case "S":
+                        pilaresultado.push((float) Math.pow(op1, op2));
                         break;
                 }
             }
         }
+
         try {
-            resultado = pilaresultado.top();
+            resultado = pilaresultado.top().intValue();
         } catch (ExceptionIsEmpty e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return resultado;
-
     }
+
 }

@@ -7,7 +7,10 @@ import Ejercicio3.PriorityQueueLinked;
 import Actividad1.*;
 import Ejercicio1.StackLink;
 
+// Esta es mi primera version en la cual me estoy dando cuenta que falta muchos detalles como primeor el detalle que solo acepta el tamaño del numero que es 1
+// en la cual solo haci operaciones con uno otro detalle que podemos ver es que es en resultExpresion cuando dividimos en entero 10/3 = 3 pero en una operacion puede ser perjudicial.
 public class pruebas {
+
     public void readFile(String ruta) {
         try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
             String linea;
@@ -19,7 +22,7 @@ public class pruebas {
                 }
                 String infija = linea.substring(1, linea.length() - 1);
                 String postfija = inToPos(infija);
-                //System.out.println(postfija);
+                // System.out.println("postfija " + postfija);
                 int resultado = resultExpresion(postfija);
                 System.out.println(infija + " = " + resultado);
             }
@@ -37,84 +40,68 @@ public class pruebas {
         operaciones.enqueue('S', 3);
         StringBuilder postfija = new StringBuilder();
         StackArray<Character> pilaoperaciones = new StackArray<>(100);
-        StringBuilder numero = new StringBuilder(); // Para construir números de más de un dígito
         try {
             for (char caracter : infija.toCharArray()) {
                 if (Character.isDigit(caracter)) {
-                    numero.append(caracter); // Agregar dígitos al número
-                } else {
-                    if (numero.length() > 0) {
-                        // Si hay un número pendiente, agregarlo a la cadena de salida
-                        postfija.append(numero.toString());
-                        postfija.append(" ");
-                        numero.setLength(0); // Limpiar el StringBuilder del número
+                    postfija.append(caracter);
+
+                } else if (operaciones.Searchel(caracter)) {
+                    while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '('
+                            && operaciones.Searchpriority(pilaoperaciones.top()) >= operaciones
+                                    .Searchpriority(caracter)) {
+                        postfija.append(pilaoperaciones.pop());
                     }
-                    if (operaciones.Searchel(caracter)) {
-                        while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '('
-                                && operaciones.Searchpriority(pilaoperaciones.top()) >= operaciones
-                                        .Searchpriority(caracter)) {
-                            postfija.append(pilaoperaciones.pop());
-                            postfija.append(" ");
-                        }
-                        pilaoperaciones.push(caracter);
-                    } else if (caracter == '(') {
-                        pilaoperaciones.push(caracter);
-                    } else if (caracter == ')') {
-                        while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '(') {
-                            postfija.append(pilaoperaciones.pop());
-                            postfija.append(" ");
-                        }
-                        pilaoperaciones.pop();
+                    pilaoperaciones.push(caracter);
+                } else if (caracter == '(') {
+                    pilaoperaciones.push(caracter);
+                } else if (caracter == ')') {
+                    while (!pilaoperaciones.isEmpty() && pilaoperaciones.top() != '(') {
+                        postfija.append(pilaoperaciones.pop());
                     }
+                    pilaoperaciones.pop();
                 }
-            }
-            if (numero.length() > 0) {
-                // Si hay un número pendiente, agregarlo a la cadena de salida
-                postfija.append(numero.toString());
-                postfija.append(" ");
             }
             while (!pilaoperaciones.isEmpty()) {
                 postfija.append(pilaoperaciones.pop());
-                postfija.append(" ");
             }
         } catch (ExceptionIsEmpty e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        return postfija.toString().trim(); // Eliminar espacios sobrantes al inicio y final
+        return postfija.toString();
     }
 
     public int resultExpresion(String postfija) {
         StackLink<Integer> pilaresultado = new StackLink<Integer>();
         int resultado = 0;
-        String[] tokens = postfija.split(" ");
-        for (String token : tokens) {
-            if (token.matches("\\d+")) { // si el token es un número
-                pilaresultado.push(Integer.parseInt(token));
-            } else { // si el token es un operador
+        for (char caracter : postfija.toCharArray()) {
+            if (Character.isDigit(caracter)) {
+                pilaresultado.push(Character.getNumericValue(caracter));
+            } else {
                 int op2 = 0;
                 int op1 = 0;
                 try {
                     op2 = pilaresultado.pop();
                     op1 = pilaresultado.pop();
                 } catch (ExceptionIsEmpty e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                switch (token) {
-                    case "+":
+                switch (caracter) {
+                    case '+':
                         pilaresultado.push(op1 + op2);
                         break;
-                    case "-":
+                    case '-':
                         pilaresultado.push(op1 - op2);
                         break;
-                    case "*":
+                    case '*':
                         pilaresultado.push(op1 * op2);
                         break;
-                    case "/":
+                    case '/':
                         pilaresultado.push(op1 / op2);
                         break;
-                    case "S":
+                    case 'S':
                         pilaresultado.push((int) Math.pow(op1, op2));
                         break;
                 }
@@ -123,9 +110,10 @@ public class pruebas {
         try {
             resultado = pilaresultado.top();
         } catch (ExceptionIsEmpty e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return resultado;
-    }
 
+    }
 }
